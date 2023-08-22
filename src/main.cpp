@@ -92,11 +92,6 @@ void read_from_file(){
     }
     std::cout<<std::endl;
 
-    // bsr = bb.read_segment(1);
-    // while((i = (int*) bsr->next(sizeof(int))) != nullptr){
-    //     std::cout << *i <<", ";
-    // }
-    // std::cout<<std::endl;
 }
 
 int main(int argc, char** argv){

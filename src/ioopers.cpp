@@ -40,7 +40,6 @@ BinarySegmentWriter* BinaryBuffer::new_segment(){
  BinarySegmentReader* BinaryBuffer::read_segment(int_type segmentid) const{
     int_type start = _binary_beginnings[segmentid];
     int_type end = 0;
-    std::printf("segmentid = %d,\t segment_counter = %d\n",(int)segmentid,(int) _segment_counter);
     if(segmentid == _segment_counter - 1){
         end = _binary.size();
     }else{
@@ -54,7 +53,7 @@ BinarySegmentWriter* BinaryBuffer::new_segment(){
 void BinaryBuffer::print() const{
     std::cout << "segments : " << std::endl;
     for(auto x : _binary_beginnings){
-        std::cout << x << " ";
+        std::cout << x << ", ";
     }
     std::cout << std::endl;
 }
@@ -65,7 +64,6 @@ void BinaryBuffer::to_file() const{
     fs::path path = fs::path(_rootdir) / fs::path(_segmentation_file_name);
     myfile.open(path.string());
     int_type x = _binary_beginnings.size()*sizeof(int_type);
-    std::printf("myfile.write((char*) &%d, %d);\n",(int) x, (int) sizeof(x));
     myfile.write((char*) &x, sizeof(x));
     myfile.write((char*) _binary_beginnings.data(), x);
     myfile.close();
@@ -73,12 +71,9 @@ void BinaryBuffer::to_file() const{
     path = fs::path(_rootdir) / fs::path(_binary_file_name);
     myfile.open(path.string());
     x = _binary.size()*sizeof(char);
-    std::printf("myfile.write((char*) &%d, %d);\n",(int) x, (int) sizeof(x));
     myfile.write((char*) &x, sizeof(x));
     myfile.write(_binary.data(), x);
     myfile.close();
-
-    
 }
 
 void BinaryBuffer::from_file(){
@@ -88,7 +83,6 @@ void BinaryBuffer::from_file(){
     int_type x;
     char r;
     myfile.read((char*) &x, sizeof(x));
-    std::printf("_binary number of elements = %d\n",(int) x);
     for(int_type i = 0; i < x; i++){
         myfile.read((char*) &r, sizeof(r));
         _binary.push_back(r);
@@ -100,16 +94,13 @@ void BinaryBuffer::from_file(){
     myfile.open(path.string());    
     myfile.read((char*) &x, sizeof(x));
     int_type y;
-    std::printf("_binary_beginnings number of elements = %d\n",(int) x);
     _segment_counter = 0;
     for(int_type i = 0; i < x/sizeof(y); i++){
         myfile.read((char*) &y, sizeof(y));
-        std::printf("_binary_beginnings.push_back(%d);\n",(int) y);
         _binary_beginnings.push_back(y);
         _segment_counter += 1;
     }
     myfile.close();
-
 }
 
 int_type BinaryBuffer::num_segments(){
