@@ -15,7 +15,6 @@ class NodeType{
         NodeType(NodeType* mother ,NodeType* children , bool leaf, int_type & num_children,int_type & node_id);
         NodeType();
         void from_binary(BinarySegmentReader* nd);
-        int_type binary_size();
         void to_buffer(BinarySegmentWriter* bb);
         bool is_leaf();
         bool is_first();

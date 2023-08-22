@@ -58,7 +58,7 @@ int ntree_indexer_test(){
 
 
 void write_to_file(){
-    std::string rootdir = "data/binaries";
+    std::string rootdir = "data/tree_binaries";
     BinaryBuffer bb(rootdir);
     BinarySegmentWriter* bsw = bb.new_segment();
 
@@ -81,7 +81,7 @@ void write_to_file(){
 }
 
 void read_from_file(){
-    std::string rootdir = "data/binaries";
+    std::string rootdir = "data/tree_binaries";
     BinaryBuffer bb(rootdir);
     bb.from_file();
     std::printf("num segments = %d\n",(int) bb.num_segments());

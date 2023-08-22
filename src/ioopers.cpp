@@ -20,11 +20,8 @@ class BinaryBuffer{
 };
 */
 
-BinaryBuffer::BinaryBuffer(std::string & rootdir){
-    if (!fs::is_directory(rootdir) || !fs::exists(rootdir)) { 
-        fs::create_directory(rootdir); 
-    }
-    _rootdir = rootdir;
+BinaryBuffer::BinaryBuffer(std::string & path){
+    _path = path;
     _binary = std::vector<char>();
     _binary_beginnings = std::vector<int_type>();
     _segment_counter = 0;
@@ -61,16 +58,16 @@ void BinaryBuffer::print() const{
 void BinaryBuffer::to_file() const{
     std::ofstream myfile;
 
-    fs::path path = fs::path(_rootdir) / fs::path(_segmentation_file_name);
-    myfile.open(path.string());
+    myfile.open(_path);
     int_type x = _binary_beginnings.size()*sizeof(int_type);
     myfile.write((char*) &x, sizeof(x));
     myfile.write((char*) _binary_beginnings.data(), x);
-    myfile.close();
+    // myfile.close();
 
-    path = fs::path(_rootdir) / fs::path(_binary_file_name);
-    myfile.open(path.string());
+    // path = fs::path(_rootdir) / fs::path(_binary_path);
+    // myfile.open(path.string());
     x = _binary.size()*sizeof(char);
+
     myfile.write((char*) &x, sizeof(x));
     myfile.write(_binary.data(), x);
     myfile.close();
@@ -78,20 +75,9 @@ void BinaryBuffer::to_file() const{
 
 void BinaryBuffer::from_file(){
     std::ifstream myfile;
-    fs::path path = fs::path(_rootdir) / fs::path(_binary_file_name);
-    myfile.open(path.string());
+    myfile.open(_path);
     int_type x;
-    char r;
-    myfile.read((char*) &x, sizeof(x));
-    for(int_type i = 0; i < x; i++){
-        myfile.read((char*) &r, sizeof(r));
-        _binary.push_back(r);
-    }
-    myfile.close();
 
-    
-    path = fs::path(_rootdir) / fs::path(_segmentation_file_name);
-    myfile.open(path.string());    
     myfile.read((char*) &x, sizeof(x));
     int_type y;
     _segment_counter = 0;
@@ -99,6 +85,14 @@ void BinaryBuffer::from_file(){
         myfile.read((char*) &y, sizeof(y));
         _binary_beginnings.push_back(y);
         _segment_counter += 1;
+    }
+
+
+    char r;
+    myfile.read((char*) &x, sizeof(x));
+    for(int_type i = 0; i < x; i++){
+        myfile.read((char*) &r, sizeof(r));
+        _binary.push_back(r);
     }
     myfile.close();
 }

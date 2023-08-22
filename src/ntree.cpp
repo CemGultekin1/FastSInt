@@ -45,39 +45,16 @@ void NodeType::from_binary(BinarySegmentReader* nd){
     }
     return;
 }
-int_type NodeType::binary_size(){
-    int_type binary_size = sizeof(_node_id) + sizeof( _num_children ) + sizeof(_node_id)*_num_children;
-    return binary_size;
-}
+
 void NodeType::to_buffer(BinarySegmentWriter* bb){
     bb->write((char*) &_node_id, sizeof(_node_id));
     bb->write((char*) &_num_children, sizeof(_num_children));
-    bb->write((char*) &_num_children, sizeof(_node_id)*_num_children);
+    int_type node_id;
+    for(int_type i=0; i<_num_children; i++){        
+        bb->write((char*) &_children[i]._node_id, sizeof(_node_id));        
+    }
+    
 }
-// void NodeType::write(std::ofstream &file, int_type& num){
-//     file.write((char*) &_num_children,sizeof(_num_children));
-//     if( _num_children == 0){
-//         return;
-//     }
-//     if(num == _num_children){ /* non full children */
-//         file.write((char*) _leaf,sizeof(bool)*num);
-//     }
-//     _node_data->write(file);
-//     return;
-// }
-
-
-// void NodeType::read(std::ifstream &file, int_type& num){
-//     file.read((char*) &_num_children,sizeof(_num_children));
-//     if(_num_children == 0){
-//         return;
-//     }
-//     if(num == _num_children){ /* non full children */
-//         file.read((char*) _leaf,sizeof(bool)*num);
-//     }
-//     _node_data->read(file);
-//     return;
-// }
 
 bool NodeType::is_leaf(){
     return _leaf;
