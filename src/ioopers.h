@@ -18,16 +18,20 @@ class BinarySegmentWriter{
 
 
 class BinarySegmentReader{    
-    const char*  _binary;
+    const char* const  _binary;
     const int_type _sizeof;
     char* _cursor;
+    const int_type _segment_id;
     public:
-        BinarySegmentReader(const char*  binary, int_type __sizeof):
+        BinarySegmentReader(const char* const  binary, int_type __sizeof,const int_type segment_id):
                             _binary(binary),
-                            _sizeof(__sizeof){
-                                _cursor = (char*) binary;
-        }
+                            _sizeof(__sizeof),
+                            _segment_id(segment_id),
+                            _cursor((char*) binary){}
         char* next(size_t size);
+        const int_type get_segment_id() const{return _segment_id;};
+        const int_type get_size() const{return _sizeof;};
+        const char* const get_binary() const{return _binary;};
 };
 
 

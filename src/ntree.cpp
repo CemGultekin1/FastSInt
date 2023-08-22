@@ -22,38 +22,52 @@ NodeType::NodeType(){
     _num_children = 0;
     _node_id = 0;
 }
-void NodeType::from_binary(BinarySegmentReader* nd){
-    char *  cursor = nd->next(sizeof(_node_id));
-    if( cursor != nullptr){
+void NodeType::delete_pointers(){
+    if(_leaf){
         return;
     }
-    _node_id = *((int_type*) cursor );
-
-
-    cursor = nd->next(sizeof(_num_children));
-    if( cursor != nullptr){
+    if(_children == nullptr){
         return;
     }
-    _leaf = false;
-    _num_children = *((int_type*) cursor );
+    for(int_type i = 0; i < _num_children; i ++){
+        _children[i].delete_pointers();
+    }
+    delete _children;
+}
+NodeType::~NodeType(){
+    delete_pointers();
+}
 
-    int_type* _children_node_ids =(int_type*) nd->next(sizeof(_node_id)*_num_children);
-    _children = (NodeType*) malloc(sizeof(NodeType)*_num_children);
+void NodeType::from_binary(BinarySegmentReader* nd,node_list* nodes){
+    _node_id = nd->get_segment_id();
+    const char* const binary = nd->get_binary();
+    int_type* _children_node_ids = (int_type*) binary;
+    _num_children = nd->get_size()/sizeof(int_type);
+    // _children = (NodeType*) malloc(sizeof(NodeType)*_num_children);
     int_type zero_children = 0;
+    NodeType* child;
     for(int_type i=0; i < _num_children; i++){
-        _children[i] = *(new NodeType(this,(NodeType*) nullptr,true,zero_children,_children_node_ids[i]));
+        child = new NodeType(this,(NodeType*) nullptr,true,zero_children,_children_node_ids[i]);
+        nodes->push_back(child);
+        _children[i] = *child;
     }
     return;
 }
 
-void NodeType::to_buffer(BinarySegmentWriter* bb){
-    bb->write((char*) &_node_id, sizeof(_node_id));
-    bb->write((char*) &_num_children, sizeof(_num_children));
+void NodeType::add_children(int_type num_children, node_list* nodes){
+    int_type first_node = nodes->size();
+    for(int_type i = 0; i < num_children; i++){
+        return;
+    }
+    return;
+}
+
+void NodeType::to_binary(BinarySegmentWriter* bb) const{
+    // bb->write((char*) &_node_id, sizeof(_node_id));
     int_type node_id;
     for(int_type i=0; i<_num_children; i++){        
         bb->write((char*) &_children[i]._node_id, sizeof(_node_id));        
     }
-    
 }
 
 bool NodeType::is_leaf(){
@@ -206,7 +220,9 @@ NodeType* NTreeIterator::next(){
 NTree::NTree(int_type nbranch,BinaryBuffer* buff){
     _nbranch = nbranch;
     _buff = buff;
-    NodeType* _head = new NodeType();
+    _node_counter = 0;
+    _nodes  = node_list();
+    _nodes.push_back(new NodeType());
 }
 void to_file(std::string _filename){
     std::ofstream file(_filename);
@@ -221,6 +237,16 @@ int_type NTree::get_max_depth(){
 }
 
 NodeType* NTree::get_head(){
-    return _head;
+    return _nodes[0];
 }
+
+NTree::~NTree(){
+    _nodes.clear();
+}
+
+
+NodeType* NTree::add_children(NodeType* x,int_type num_children){
+
+}
+
 // void from_file(std::string _filename);

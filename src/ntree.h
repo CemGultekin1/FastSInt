@@ -5,6 +5,7 @@
 #include <cstring>
 #include "ioopers.h"
 
+
 class NodeType{
     NodeType* _mother;
     NodeType* _children;
@@ -14,12 +15,17 @@ class NodeType{
     public:
         NodeType(NodeType* mother ,NodeType* children , bool leaf, int_type & num_children,int_type & node_id);
         NodeType();
-        void from_binary(BinarySegmentReader* nd);
-        void to_buffer(BinarySegmentWriter* bb);
+        void from_binary(BinarySegmentReader* nd,std::vector<NodeType*>* node_list);
+        void to_binary(BinarySegmentWriter* bb) const;
         bool is_leaf();
         bool is_first();
+        void delete_pointers();
+        ~NodeType();
+        void add_children(int_type num_children,std::vector<NodeType*>* node_list);
 };
 
+
+typedef std::vector<NodeType*> node_list;
 class NTreeIndex{    
     public:
         int_type _depth;
@@ -45,15 +51,18 @@ class NTreeIndexer{
 
 
 class NTree{
-    NodeType* _head;
+    node_list _nodes;
     int_type _nbranch;
     int_type _depth;
+    int_type _node_counter;
     BinaryBuffer* _buff;
     public:
         NTree(int_type nbranch,BinaryBuffer* buff);
         int_type get_nbranch();
         int_type get_max_depth();
         NodeType* get_head();
+        ~NTree();
+        NodeType* add_children(NodeType* x,int_type num_children);
 };
 
 

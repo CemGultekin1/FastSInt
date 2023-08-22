@@ -4,21 +4,6 @@
 namespace fs = std::filesystem;
 
 
-/*
-class BinaryBuffer{
-    std::vector<char> _binary;
-    std::vector<int_type> _nbinaries;
-    std::vector<int_type> _binary_beginnings;
-    std::string _path;
-    int_type _segment_counter;
-    public: 
-        BinaryBuffer(std::string path);
-        BinarySegmentWriter* new_segment();
-        BinarySegment* read_segment(int_type& segmentid);
-        void to_file();
-        void from_file();
-};
-*/
 
 BinaryBuffer::BinaryBuffer(std::string & path){
     _path = path;
@@ -44,7 +29,7 @@ BinarySegmentWriter* BinaryBuffer::new_segment(){
     }
     const int_type len = end - start;
     const char*  binary_pointer = _binary.data();
-    return new BinarySegmentReader(&binary_pointer[start],len);
+    return new BinarySegmentReader(&binary_pointer[start],len,segmentid);
 }
 
 void BinaryBuffer::print() const{
@@ -109,15 +94,6 @@ BinaryBuffer::~BinaryBuffer(){
 
 
 
-/*
-class BinarySegmentWriter{
-    BinaryBuffer* _buff;
-    int_type _segment_id;
-    public:
-        BinarySegmentWriter(BinaryBuffer* buff,int_type & segment_id);
-        void write(char* x,size_t size);
-};
-*/
 
 BinarySegmentWriter::BinarySegmentWriter(std::vector<char> * binary){
     _binary = binary;
