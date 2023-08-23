@@ -60,21 +60,15 @@ int ntree_indexer_test(){
 void write_to_file(){
     std::string path = "data/tree_binaries";
     BinaryBuffer bb;
-    BinarySegmentWriter* bsw = bb.new_segment();
-
-    // char b = 'b';
-    for(int i = 0; i < 3; i++){
-        bsw->write((char*) &i, sizeof(i));
+    
+    BinarySegmentWriter* bsw;
+    for(int j = 0; j < 5; j ++){
+        bsw = bb.new_segment();
+        for(int i = 0; i < j; i++){
+            bsw->write((char*) &i, sizeof(i));
+        }
+        delete bsw;
     }
-    delete bsw;
-
-
-    bsw = bb.new_segment();
-    // char a = 'a';
-    for(int i = 3; i < 10; i++){
-        bsw->write((char*) &i, sizeof(i));
-    }
-    delete bsw;
 
     bb.print();
     bb.to_file(path);
@@ -82,40 +76,55 @@ void write_to_file(){
 
 void read_from_file(){
     std::string path = "data/tree_binaries";
-    BinaryBuffer bb;
-    bb.from_file(path);
-    std::printf("num segments = %d\n",(int) bb.num_segments());
-    BinarySegmentReader* bsr = bb.read_segment(1);
-    int* i;
-    while((i = (int*) bsr->next(sizeof(int))) != nullptr){
-        std::cout << *i <<", ";
+    BinaryBuffer* bb = new BinaryBuffer();
+    bb->from_file(path);
+    std::printf("num segments = %d\n",(int) bb->num_segments());
+    BinarySegmentReader* bsr;
+    for(int j = 0; j < 5; j ++){
+        bsr = bb->read_segment(j);
+        int* i;
+        while((i = (int*) bsr->next(sizeof(int))) != nullptr){
+            std::cout << *i <<", ";
+        }
+        std::cout<<std::endl;
+        delete bsr;
     }
-    std::cout<<std::endl;
-
+    delete bb;
 }
 
 
-void node_test(){
+void tree_write(){
     int_type nbranch = 5;
-    BinaryBuffer* bb = new BinaryBuffer();
-    NTree ntree(nbranch,bb);
+    NTree ntree(nbranch);
     NodeType* node = ntree._nodes[0];
     NodeType* node1 = ntree.branch_from_node(node, 3);
-    NodeType* node2 = ntree.branch_from_node(node1++,4);
-    NodeType* node3 =ntree.branch_from_node(node2++,5);
-    ntree.branch_from_node(node3,2);
-    ntree.print();
+    NodeType* node2 = ntree.branch_from_node(node1,4);
+    NodeType* node3 =ntree.branch_from_node(node2,5);
 
+
+    ntree.branch_from_node(node3,2);
+    ntree.to_file("data/tree_binaries");
+    ntree.print();
 }
+
+void tree_read(){
+    int_type nbranch = 5;
+    NTree ntree(nbranch);
+    ntree.from_file("data/tree_binaries");
+    ntree.print();
+}
+
 
 int main(int argc, char** argv){
     std::string arg = argv[1];
-    if (arg == "--write"){    
+    if (arg == "--write_tree"){    
+        tree_write();
+    }else if (arg == "--read_tree"){
+        tree_read();
+    }else if (arg == "--write"){    
         write_to_file();
     }else if (arg == "--read"){
         read_from_file();
-    }else if (arg == "--node"){
-        node_test();
     }else{
         std::printf("argument %s not understood\n", arg.c_str());
     }

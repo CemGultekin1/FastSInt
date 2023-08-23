@@ -21,6 +21,8 @@ class NodeType{
         void set_num_children(int_type num_children);
         bool is_leaf();
         bool is_first();
+        std::string to_string() const;
+        void print() const;
         void delete_pointers();
         int_type get_num_children();
         int_type get_node_id();
@@ -58,10 +60,9 @@ class NTree{
     int_type _nbranch;
     int_type _depth;
     int_type _node_counter;
-    BinaryBuffer* _buff;
     public:
         std::vector<NodeType*> _nodes;
-        NTree(int_type nbranch,BinaryBuffer* buff);
+        NTree(int_type nbranch);
         int_type get_nbranch();
         int_type get_max_depth();
         NodeType* get_head();
