@@ -42,18 +42,6 @@ int midpoint_test(){
 }
 
 
-int ntree_indexer_test(){
-    int_type depth = 3;
-    int_type width = 2;
-    NTreeIndexer* tc = new NTreeIndexer(depth,width);
-    NTreeIndex* tcrd = tc->next();
-    int i = 0;
-    while(tcrd != nullptr){
-        tcrd = tc->next();
-        i += 1;
-    }
-    return 0;
-}
 
 
 
@@ -94,8 +82,7 @@ void read_from_file(){
 
 
 void tree_write(){
-    int_type nbranch = 5;
-    NTree ntree(nbranch);
+    NTree ntree;
     NodeType* node = ntree._nodes[0];
     NodeType* node1 = ntree.branch_from_node(node, 3);
     NodeType* node2 = ntree.branch_from_node(node1,4);
@@ -113,7 +100,7 @@ void tree_read(){
     ntree.from_file("data/tree_binaries");
     ntree.print();
     std::cout << "-----------------------" << std::endl;
-    NodeType* node = ntree._nodes[2];
+    NodeType* node = ntree._nodes[14];
     ntree.branch_from_node(node, 7);
     ntree.print();
 }

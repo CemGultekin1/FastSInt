@@ -126,148 +126,39 @@ NodeType* NodeType::get_children(){
     return _children;
 }
 
-/*
-NTreeIndex
-*/
-void NTreeIndex::print(){
-    std::cout << _depth << " " << _child_ind << std::endl;
+
+
+
+int_type NodeType::get_depth(){
+    int_type depth = 0;
+    NodeType* mother = _mother;
+    while(mother != nullptr){
+        depth+=1;
+        mother = mother->_mother;
+    }
+    return depth;
 }
-
-
-/*
-NTreeIndexer
-*/
-
-NTreeIndexer::NTreeIndexer(int_type max_depth,int_type max_width){
-    /*
-    _current_depth
-    _cursor_arr
-    _max_width
-    _max_depth
-    */
-    _current_depth = 0;
-    _max_depth = max_depth;
-    _max_width = max_width;
-    _cursor_arr = nullptr;
-    _cur_coordinate = nullptr;
-    _empty = max_depth == 0;
-    if(!_empty){
-        _cursor_arr = (int_type*) malloc(max_depth*sizeof(int_type));
-        _cursor_arr[0] = 0;
-        _cur_coordinate = new NTreeIndex(0,0);
-    }
-}
-
-NTreeIndex* NTreeIndexer::next(){
-    if(_empty){
-        return nullptr;
-    }
-    
-    int_type curw = _cursor_arr[_current_depth];
-
-    _cur_coordinate->_depth = _current_depth;
-    _cur_coordinate->_child_ind = curw;
-
-    if(_current_depth < _max_depth - 1){
-        _cursor_arr[_current_depth]+=1;
-        _current_depth += 1;
-        _cursor_arr[_current_depth] = 0;
-        return _cur_coordinate;
-    }else if(curw < _max_width){
-        _cursor_arr[_current_depth]+=1;
-        return _cur_coordinate;
-    }
-    while(curw == _max_width){
-        _cursor_arr[_current_depth] = 0;
-        _current_depth -= 1;
-        if(_current_depth >= 0){
-            curw = _cursor_arr[_current_depth];
-        }else{
-            break;
-        }
-    }
-    if(_current_depth < 0){
-        return nullptr;
-    }
-    _cur_coordinate->_depth = _current_depth;
-    _cur_coordinate->_child_ind = curw;
-
-    _cursor_arr[_current_depth]+=1;
-    _current_depth+= 1;
-
-    return _cur_coordinate;
-}
-
-NTreeIndexer::~NTreeIndexer(){
-    if(!_empty){
-        delete[] _cursor_arr;
-        delete[] _cur_coordinate;
-    }
-}    
-
-void NTreeIndexer::print(){
-    if(_empty){
-        return;
-    }
-    for(int_type i = 0; i < _max_depth; i++){
-        std::cout << _cursor_arr[i] << ", ";
-    }
-    std::cout << std::endl;
-}
-/*
-NTreeIterator
-*/
-
-
-NTreeIterator::NTreeIterator(NTree* NTree){
-    _nbranch = NTree->get_nbranch();
-    _cur_depth = 0;
-    _current = NTree->get_head();
-    int_type max_depth = NTree->get_max_depth();
-    _counter = new NTreeIndexer(max_depth,_nbranch);
-    _head_counted = false;
-}
-NTreeIterator::~NTreeIterator(){
-    _counter->~NTreeIndexer();
-}
-
-NodeType* NTreeIterator::next(){
-    if( !_head_counted){
-        _head_counted = true;
-        return _current;
-    }
-    NTreeIndex* tc = _counter->next();
-    if(tc == nullptr){
-        return nullptr;
-    }
-    int_type depth = tc->_depth;
-    while(depth < _cur_depth)
-    if(depth - _cur_depth == 1){
-        return nullptr;
-    }
-    return nullptr;
-}
-
-
 
 
 
 NTree::NTree(int_type nbranch){//BinaryBuffer* buff){
     _nbranch = nbranch;
-    _node_counter = 0;
+    _depth = 0;
     _nodes  = std::vector<NodeType*>();
     NodeType* head = new NodeType();
     _nodes.push_back(head);
-    // _buff = buff;
-
-    // BinarySegmentWriter* bsw = buff->new_segment();
-    // head->to_binary(bsw);
-    // delete bsw;
 }
 
 void NTree::to_file(std::string _filename){
     BinaryBuffer* buff = new BinaryBuffer();
     BinarySegmentWriter* bsw;
+    // writing the headers
+    bsw = buff->new_segment();
+    bsw->write((char*) &_nbranch, sizeof(_nbranch));
+    bsw->write((char*) &_depth, sizeof(_depth));
+    delete bsw;
+    
+    // writing the nodes
     for(auto nodeptr: _nodes){
         bsw = buff->new_segment();
         nodeptr->to_binary(bsw);
@@ -280,14 +171,18 @@ void NTree::to_file(std::string _filename){
 void NTree::from_file(std::string _filename){
     BinaryBuffer* buff = new BinaryBuffer();
     buff->from_file(_filename);  
-    int_type nsegs = buff->num_segments();
+    int_type nsegs = buff->num_segments() - 1;
     BinarySegmentReader* bsr;    
     _nodes.resize(nsegs,nullptr);
     NodeType * nt = _nodes[0];
     
     
-
     bsr = buff->read_segment(0);
+    _nbranch = *((int_type*) bsr->next(sizeof(_nbranch)));
+    _depth = *((int_type*) bsr->next(sizeof(_depth)));
+    delete bsr;
+
+    bsr = buff->read_segment(1);
     nt->from_binary(bsr,&_nodes);
     delete bsr;
 
@@ -304,7 +199,7 @@ void NTree::from_file(std::string _filename){
     int_type i1;
     int_type i2;
     while(i < tobechecked.size()){
-        bsr = buff->read_segment(i);     
+        bsr = buff->read_segment(i + 1);     
         nt = _nodes[i]; //new NodeType();
         nt->from_binary(bsr,&_nodes);
         delete bsr;
@@ -351,12 +246,19 @@ NodeType* NTree::branch_from_node(NodeType* x,int_type num_children, int_type fi
     if(! (x->is_leaf())){
         throw std::invalid_argument("The node " + std::to_string(x->get_node_id()) + " is not a leaf!");
     }
+    if(num_children == 0){
+        return nullptr;
+    }
     x->set_num_children(num_children);
     if(first_child_node_id == NLLC){    
         first_child_node_id = _nodes.size();
     }
     
     x->add_children(&_nodes,first_child_node_id);
+    int_type new_depth = x->get_depth() + 1;
+    if(new_depth > _depth){
+        _depth = new_depth;
+    }
     return x->get_children();
 }
 
@@ -365,6 +267,8 @@ void NTree::print(){
     int_type mother_id = -1;
     int_type node_id;
     int_type width = 6;
+    std::cout << "max number of branches = " << _nbranch <<std::endl;
+    std::cout << "depth = " << _depth <<std::endl;
     for(auto nodeptr: _nodes){
         std::cout << nodeptr->to_string() << std::endl;
         // if(!(nodeptr->is_first())){

@@ -29,29 +29,7 @@ class NodeType{
         NodeType* get_mother();
         NodeType* get_children();
         ~NodeType();
-};
-
-
-class NTreeIndex{    
-    public:
-        int_type _depth;
-        int_type _child_ind;
-        NTreeIndex(int_type depth,int_type child_ind): _depth(depth),_child_ind(child_ind){};
-        void print();
-};
-
-class NTreeIndexer{
-    int_type _current_depth;
-    int_type* _cursor_arr;
-    int_type _max_width;
-    int_type _max_depth;
-    NTreeIndex* _cur_coordinate;
-    bool _empty;
-    public:
-        NTreeIndexer(int_type max_depth,int_type max_width);
-        NTreeIndex* next();
-        ~NTreeIndexer();
-        void print();
+        int_type get_depth();
 };
 
 
@@ -59,10 +37,9 @@ class NTreeIndexer{
 class NTree{    
     int_type _nbranch;
     int_type _depth;
-    int_type _node_counter;
     public:
         std::vector<NodeType*> _nodes;
-        NTree(int_type nbranch);
+        NTree(int_type nbranch = NLLC);
         int_type get_nbranch();
         int_type get_max_depth();
         NodeType* get_head();
@@ -75,15 +52,3 @@ class NTree{
 
 
 
-
-class NTreeIterator{
-    int_type _nbranch;
-    int_type _cur_depth;
-    NodeType* _current;
-    NTreeIndexer* _counter;
-    bool _head_counted;
-    public:
-        NTreeIterator(NTree* NTree);
-        NodeType* next();
-        ~NTreeIterator();
-};
