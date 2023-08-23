@@ -347,20 +347,16 @@ NTree::~NTree(){
 }
 
 
-NodeType* NTree::branch_from_node(NodeType* x,int_type num_children){
+NodeType* NTree::branch_from_node(NodeType* x,int_type num_children, int_type first_child_node_id ){
     if(! (x->is_leaf())){
         throw std::invalid_argument("The node " + std::to_string(x->get_node_id()) + " is not a leaf!");
     }
     x->set_num_children(num_children);
-    int_type first_child_node_id = _nodes.size();
+    if(first_child_node_id == NLLC){    
+        first_child_node_id = _nodes.size();
+    }
+    
     x->add_children(&_nodes,first_child_node_id);
-    // NodeType* cursor = x->get_children();
-    // BinarySegmentWriter* bsw;
-    // for(int_type i = 0; i < num_children; i ++, cursor++ ){
-    //     bsw = _buff->new_segment();
-    //     cursor->to_binary(bsw);
-    //     delete bsw;
-    // }    
     return x->get_children();
 }
 

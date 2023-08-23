@@ -69,7 +69,7 @@ class NTree{
         void to_file(std::string _filename);
         void from_file(std::string _filename);
         ~NTree();
-        NodeType* branch_from_node(NodeType* x,int_type num_children);
+        NodeType* branch_from_node(NodeType* ,int_type ,int_type  = NLLC);
         void print();
 };
 

@@ -112,6 +112,10 @@ void tree_read(){
     NTree ntree(nbranch);
     ntree.from_file("data/tree_binaries");
     ntree.print();
+    std::cout << "-----------------------" << std::endl;
+    NodeType* node = ntree._nodes[2];
+    ntree.branch_from_node(node, 7);
+    ntree.print();
 }
 
 
