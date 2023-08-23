@@ -38,14 +38,13 @@ class BinarySegmentReader{
 class BinaryBuffer{
     std::vector<char> _binary;
     std::vector<int_type> _binary_beginnings;
-    std::string _path;
     int_type _segment_counter;
     public: 
-        BinaryBuffer(std::string & path);
+        BinaryBuffer();
         BinarySegmentWriter* new_segment();
         BinarySegmentReader* read_segment(int_type segmentid) const;
-        void to_file() const;
-        void from_file();
+        void to_file(std::string & path) const;
+        void from_file(std::string & path);
         void print() const;
         ~BinaryBuffer();
         int_type num_segments();

@@ -5,8 +5,7 @@ namespace fs = std::filesystem;
 
 
 
-BinaryBuffer::BinaryBuffer(std::string & path){
-    _path = path;
+BinaryBuffer::BinaryBuffer(){
     _binary = std::vector<char>();
     _binary_beginnings = std::vector<int_type>();
     _segment_counter = 0;
@@ -19,7 +18,7 @@ BinarySegmentWriter* BinaryBuffer::new_segment(){
     return bsw;
 }
 
- BinarySegmentReader* BinaryBuffer::read_segment(int_type segmentid) const{
+BinarySegmentReader* BinaryBuffer::read_segment(int_type segmentid) const{
     int_type start = _binary_beginnings[segmentid];
     int_type end = 0;
     if(segmentid == _segment_counter - 1){
@@ -40,10 +39,10 @@ void BinaryBuffer::print() const{
     std::cout << std::endl;
 }
 
-void BinaryBuffer::to_file() const{
+void BinaryBuffer::to_file(std::string & path) const{
     std::ofstream myfile;
 
-    myfile.open(_path);
+    myfile.open(path);
     int_type x = _binary_beginnings.size()*sizeof(int_type);
     myfile.write((char*) &x, sizeof(x));
     myfile.write((char*) _binary_beginnings.data(), x);
@@ -58,9 +57,9 @@ void BinaryBuffer::to_file() const{
     myfile.close();
 }
 
-void BinaryBuffer::from_file(){
+void BinaryBuffer::from_file(std::string & path){
     std::ifstream myfile;
-    myfile.open(_path);
+    myfile.open(path);
     int_type x;
 
     myfile.read((char*) &x, sizeof(x));

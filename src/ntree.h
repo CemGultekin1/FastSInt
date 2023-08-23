@@ -15,17 +15,21 @@ class NodeType{
     public:
         NodeType(NodeType* mother ,NodeType* children , bool leaf, int_type & num_children,int_type & node_id);
         NodeType();
-        void from_binary(BinarySegmentReader* nd,std::vector<NodeType*>* node_list);
+        void from_binary(BinarySegmentReader* nd,std::vector<NodeType*> * nodes);
         void to_binary(BinarySegmentWriter* bb) const;
+        void add_children(std::vector<NodeType*> * nodes,int_type first_child_node_id);
+        void set_num_children(int_type num_children);
         bool is_leaf();
         bool is_first();
         void delete_pointers();
+        int_type get_num_children();
+        int_type get_node_id();
+        NodeType* get_mother();
+        NodeType* get_children();
         ~NodeType();
-        void add_children(int_type num_children,std::vector<NodeType*>* node_list);
 };
 
 
-typedef std::vector<NodeType*> node_list;
 class NTreeIndex{    
     public:
         int_type _depth;
@@ -50,19 +54,22 @@ class NTreeIndexer{
 
 
 
-class NTree{
-    node_list _nodes;
+class NTree{    
     int_type _nbranch;
     int_type _depth;
     int_type _node_counter;
     BinaryBuffer* _buff;
     public:
+        std::vector<NodeType*> _nodes;
         NTree(int_type nbranch,BinaryBuffer* buff);
         int_type get_nbranch();
         int_type get_max_depth();
         NodeType* get_head();
+        void to_file(std::string _filename);
+        void from_file(std::string _filename);
         ~NTree();
-        NodeType* add_children(NodeType* x,int_type num_children);
+        NodeType* branch_from_node(NodeType* x,int_type num_children);
+        void print();
 };
 
 

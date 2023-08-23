@@ -58,8 +58,8 @@ int ntree_indexer_test(){
 
 
 void write_to_file(){
-    std::string rootdir = "data/tree_binaries";
-    BinaryBuffer bb(rootdir);
+    std::string path = "data/tree_binaries";
+    BinaryBuffer bb;
     BinarySegmentWriter* bsw = bb.new_segment();
 
     // char b = 'b';
@@ -77,13 +77,13 @@ void write_to_file(){
     delete bsw;
 
     bb.print();
-    bb.to_file();
+    bb.to_file(path);
 }
 
 void read_from_file(){
-    std::string rootdir = "data/tree_binaries";
-    BinaryBuffer bb(rootdir);
-    bb.from_file();
+    std::string path = "data/tree_binaries";
+    BinaryBuffer bb;
+    bb.from_file(path);
     std::printf("num segments = %d\n",(int) bb.num_segments());
     BinarySegmentReader* bsr = bb.read_segment(1);
     int* i;
@@ -94,12 +94,28 @@ void read_from_file(){
 
 }
 
+
+void node_test(){
+    int_type nbranch = 5;
+    BinaryBuffer* bb = new BinaryBuffer();
+    NTree ntree(nbranch,bb);
+    NodeType* node = ntree._nodes[0];
+    NodeType* node1 = ntree.branch_from_node(node, 3);
+    NodeType* node2 = ntree.branch_from_node(node1++,4);
+    NodeType* node3 =ntree.branch_from_node(node2++,5);
+    ntree.branch_from_node(node3,2);
+    ntree.print();
+
+}
+
 int main(int argc, char** argv){
     std::string arg = argv[1];
     if (arg == "--write"){    
         write_to_file();
     }else if (arg == "--read"){
         read_from_file();
+    }else if (arg == "--node"){
+        node_test();
     }else{
         std::printf("argument %s not understood\n", arg.c_str());
     }
