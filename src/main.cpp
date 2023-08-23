@@ -1,12 +1,12 @@
 #include <iostream>
 #include <stdexcept>
 #include "midpoint.h"
-#include "ntree.h"
+#include "dag.h"
 #include <cmath>
 #include "ioopers.h"
 
 class Simplex{
-    Simplex* mother;
+    Simplex* parent;
     Simplex* children;
     Midpoint* midpoint;
 };
@@ -46,7 +46,7 @@ int midpoint_test(){
 
 
 void write_to_file(){
-    std::string path = "data/tree_binaries";
+    std::string path = "data/dag_binaries";
     BinaryBuffer bb;
     
     BinarySegmentWriter* bsw;
@@ -63,7 +63,7 @@ void write_to_file(){
 }
 
 void read_from_file(){
-    std::string path = "data/tree_binaries";
+    std::string path = "data/dag_binaries";
     BinaryBuffer* bb = new BinaryBuffer();
     bb->from_file(path);
     std::printf("num segments = %d\n",(int) bb->num_segments());
@@ -81,37 +81,37 @@ void read_from_file(){
 }
 
 
-void tree_write(){
-    NTree ntree;
-    NodeType* node = ntree._nodes[0];
-    NodeType* node1 = ntree.branch_from_node(node, 3);
-    NodeType* node2 = ntree.branch_from_node(node1,4);
-    NodeType* node3 =ntree.branch_from_node(node2,5);
+void dag_write(){
+    DAG dag;
+    GraphEdgeType* edge = dag._edges[0];
+    GraphEdgeType* edge1 = dag.branch_from_edge(edge, 3);
+    GraphEdgeType* edge2 = dag.branch_from_edge(edge1,4);
+    GraphEdgeType* edge3 =dag.branch_from_edge(edge2,5);
 
 
-    ntree.branch_from_node(node3,2);
-    ntree.to_file("data/tree_binaries");
-    ntree.print();
+    dag.branch_from_edge(edge3,2);
+    dag.to_file("data/dag_binaries");
+    dag.print();
 }
 
-void tree_read(){
-    int_type nbranch = 5;
-    NTree ntree(nbranch);
-    ntree.from_file("data/tree_binaries");
-    ntree.print();
+void dag_read(){
+    int_type width = 5;
+    DAG dag(width);
+    dag.from_file("data/dag_binaries");
+    dag.print();
     std::cout << "-----------------------" << std::endl;
-    NodeType* node = ntree._nodes[14];
-    ntree.branch_from_node(node, 7);
-    ntree.print();
+    GraphEdgeType* edge = dag._edges[14];
+    dag.branch_from_edge(edge, 7);
+    dag.print();
 }
 
 
 int main(int argc, char** argv){
     std::string arg = argv[1];
-    if (arg == "--write_tree"){    
-        tree_write();
-    }else if (arg == "--read_tree"){
-        tree_read();
+    if (arg == "--write_dag"){    
+        dag_write();
+    }else if (arg == "--read_dag"){
+        dag_read();
     }else if (arg == "--write"){    
         write_to_file();
     }else if (arg == "--read"){
