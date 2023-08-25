@@ -6,7 +6,7 @@
 #include "ioopers.h"
 #include "constants.h"
 #include "midptransform.h"
-
+#include "databases.h"
 class Simplex{
     Simplex* parent;
     Simplex* children;
@@ -95,33 +95,35 @@ void rotate_demo(){
 
 
 void midpoint_demo(){
-    int_type dim = 10;
+    const int_type dim = 10;    
+    const int_type length = 5;
     int_type depth = 4;
     int_type node_id = dim+2;
-    float_type* x1 = new float_type[dim];
-    float_type* x2 = new float_type[dim];
+    // _RandomDataBase rdb(dim,length);
 
-    random_vector_generator rng(4);
-
-    random_data_point(x1,dim,rng);
-    random_data_point(x2,dim,rng);
-
-    IncondenseMidpoint* imidp1 = new IncondenseMidpoint(x1,dim,depth,node_id);
-    IncondenseMidpoint* imidp2 = new IncondenseMidpoint(x2,dim,depth,node_id);
-    Midpoint* midp = imidp1->condensate();
-    imidp1->print();
-    imidp2->print();
+    typedef RandomDataBase<dim,length> myrdb;
+    myrdb rdb;
+    DataBaseInterface<myrdb> dbi(&rdb);
+    DataPoint* dp = dbi.next();
+    dp->print();
+    delete dp;
+    return ;
+    // IncondenseMidpoint* imidp1 = new IncondenseMidpoint(x1,dim,depth,node_id);
+    // IncondenseMidpoint* imidp2 = new IncondenseMidpoint(x2,dim,depth,node_id);
+    // Midpoint* midp = imidp1->condensate();
+    // imidp1->print();
+    // imidp2->print();
     
 
-    MidpointTransform mt(midp,imidp2);
-    int_type ei = mt.exit_index();
-    std::cout  << "exit_index = " << ei << std::endl;
+    // MidpointTransform mt(midp,imidp2);
+    // int_type ei = mt.exit_index();
+    // std::cout  << "exit_index = " << ei << std::endl;
 
-    delete [] x1;
-    delete [] x2;
-    delete midp;
-    delete imidp1;
-    delete imidp2;   
+    // delete [] x1;
+    // delete [] x2;
+    // delete midp;
+    // delete imidp1;
+    // delete imidp2;   
 }
 
 int main(int argc, char** argv){
