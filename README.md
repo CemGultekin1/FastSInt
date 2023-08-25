@@ -11,6 +11,6 @@ Use the following command to run the program defined in `main.cpp`
 ```
 In order to add arguments to the run or ask for help use the following commands.
 ```bash
-./build/final_program --help;
-./build/final_program --midpoint;
+./build/final_program --help
+./build/final_program --midpoint
 ```
