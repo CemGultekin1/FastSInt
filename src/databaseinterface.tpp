@@ -1,4 +1,4 @@
-
+#include <iostream>
 
 template <class DB>
 DataBaseInterface<DB>::DataBaseInterface(DB* adb){
@@ -13,7 +13,7 @@ DataBaseInterface<DB>::DataBaseInterface(DB* adb){
 template <class DB>
 void DataBaseInterface<DB>::init_virtual_nodes(){
     _expressive_data_id_subset.resize(_dim+1, NLLC);
-    _counter = _expressive_data_id_subset.size();
+    // _counter = _expressive_data_id_subset.size();
 }
 
 template <class DB>
@@ -27,6 +27,8 @@ DataPoint* DataBaseInterface<DB>::next(){
         init_virtual_nodes();
     }
     dp->_data_id = _counter;
+    // std::cout << "dp->_node_id = _expressive_data_id_subset.size();  " <<  _expressive_data_id_subset.size() << std::endl;
+    dp->_node_id = _expressive_data_id_subset.size();
     if(dp != nullptr){
         _counter ++;
         if(_length < _counter){
@@ -42,6 +44,12 @@ void DataBaseInterface<DB>::reset_counter(){
     _counter = 0;
 }
 
+template <class DB>
+void DataBaseInterface<DB>::add_expressive_node(int_type data_id){
+    _expressive_data_id_subset.push_back(data_id);
+}
+
+
 
 template <int_type DIM,int_type LENGTH>
 DataPoint*  RandomDataBase<DIM,LENGTH>::operator[](int_type i){
@@ -49,6 +57,6 @@ DataPoint*  RandomDataBase<DIM,LENGTH>::operator[](int_type i){
         return nullptr;
     }
     float_type* weights = new float_type[DIM];
-    random_vector_generator rvg(i+1);    
+    random_vector_generator rvg(i*DIM + 1);    
     return allocate_random_dp(DIM,rvg);
 }

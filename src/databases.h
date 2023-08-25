@@ -3,20 +3,13 @@
 #include <vector>
 #include "random.h"
 
-/*
-class AbstractDataBase{
-    public:
-        virtual float_type* operator[](int_type) = 0;
-        virtual int_type get_dimension() = 0;
-        virtual int_type get_length() = 0;
-};
-*/
 
 class DataPoint{
     public:
         int_type _data_id;
         float_type* _weights;
         int_type _dim;
+        int_type _node_id;
         DataPoint(int_type dim);
         ~DataPoint();
         void print();
@@ -45,6 +38,7 @@ class DataBaseInterface{
         DataPoint* next();
         void reset_counter();
         void init_virtual_nodes();
+        void add_expressive_node(int_type data_id);
 };
 
 

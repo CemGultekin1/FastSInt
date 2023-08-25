@@ -19,10 +19,9 @@ class Midpoint{
         void print() const;
         void set(int_type &i, float_type& w, int_type& c);
         bool is_empty();
-        // int_type find_single_exit(IncondenseMidpoint*);
-        // void transform(IncondenseMidpoint*,int_type);
-        // void find_all_exits(IncondenseMidpoint*);
         int_type get_length();
+        float_type sum() const;
+
 };
 
 class IncondenseMidpoint:public Midpoint{
@@ -31,7 +30,7 @@ class IncondenseMidpoint:public Midpoint{
         int_type _last;
         bool _incondense;
         IncondenseMidpoint(float_type* &weights,int_type* &coords, int_type& last, int_type& length,int_type& node_id);
-        IncondenseMidpoint(float_type* &weights,int_type& dim, int_type& depth,int_type& node_id);
+        IncondenseMidpoint(float_type* &weights,int_type& dim,int_type& node_id, int_type& depth);
         void concatenate(float_type& w, int_type& c);
         int_type get_condensed_length() const;
         Midpoint* condensate() const;

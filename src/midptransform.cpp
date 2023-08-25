@@ -1,5 +1,5 @@
 #include "midptransform.h"
-
+#include <iostream>
 
 MidpointTransform::MidpointTransform(Midpoint* midp,IncondenseMidpoint*imidp){
     _midp = midp;
@@ -21,6 +21,9 @@ IncondenseMidpoint* MidpointTransform::run_transform(){
     float_type* w0 = _imidp->_weights;
 
     float_type alpha = w0[_exit_ind_imidp]/wm[_exit_ind];
+
+    std::cout << "int_type new_coord = _midp->_node_id; "<< new_coord << std::endl;
+    std::cout << "_exit_ind_imidp, _exit_ind,alpha = " << _exit_ind_imidp << "  " << _exit_ind << "  " << alpha << std::endl;
     if(alpha == 0){
         return _imidp;
     }
@@ -68,7 +71,7 @@ void MidpointTransform::all_exit_indices(float_type tol, int_type* mem){
             break;
         }
         if(*c0==*cm){
-            tstar1 = (*w0 - *wm)/(*wm);
+            tstar1 = (*w0 - *wm)/(*wm);            
             if(tstar1 - tstar < tol){
                 *mem1 = cm - cm_init;
                 mem1++;
@@ -125,18 +128,23 @@ int_type MidpointTransform::exit_index(){
         }
         if(*c0==*cm){
             if(*w0 > 0){
-                tstar1 = *wm/(*wm - *w0);
-                if(tstar_init){
-                    if(tstar1 < tstar){
+                if(*wm > *w0){
+                    // std::cout.precision(3);
+                    // std::cout << std:: scientific;
+                    tstar1 = *wm/(*wm - *w0);
+                    // std::cout << *c0 << " tstar1 = " << tstar1 << " = " <<  *wm << "/(" <<  *wm  << " - " << *w0 << ")" << std::endl;
+                    if(tstar_init){
+                        if(tstar1 < tstar){
+                            tstar = tstar1;
+                            imstar = cm - cm_init;
+                            i0star = c0 - c0_init;;
+                        }
+                    }else{
                         tstar = tstar1;
                         imstar = cm - cm_init;
                         i0star = c0 - c0_init;;
+                        tstar_init = true;
                     }
-                }else{
-                    tstar = tstar1;
-                    imstar = cm - cm_init;
-                    i0star = c0 - c0_init;;
-                    tstar_init = true;
                 }
             }else{
                 _exit_ind = cm - cm_init;

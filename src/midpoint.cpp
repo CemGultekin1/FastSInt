@@ -32,21 +32,32 @@ Midpoint::~Midpoint(){
 }
 
 void Midpoint::print() const{
-    std::cout << "Midpoint::print()" << std::endl;
     float_type* w = _weights;
     // int width = 8;
     std::cout.precision(3);
     for(int_type* c = _coords; *c != EOC; c++,w++){
         std::cout << std::setw(4) << std::fixed <<*c  << std::setw(12) << std::scientific << *w << std::endl;
     }
+    float_type s = sum();
+    std::cout << std::setw(4) << "sum:   " << std::scientific << std::setw(16) << s << std::endl;
+}
+float_type Midpoint::sum() const{
+    float_type* w = _weights;
+    float_type s = 0;
+    for(int_type* c = _coords; *c != EOC; c++,w++){
+        if(*c!= NLLC){
+            s += *w;
+        }
+    }
+    return s;
 }
 
 void IncondenseMidpoint::print() const{
-    std::cout << "IncondenseMidpoint::print()" << std::endl;
     Midpoint::print();
     std::cout << std::fixed;
     std::cout << std::setw(4) << "length: " << std::setw(16) << _length <<std:: endl;
     std::cout << std::setw(4) << "last:   " << std::setw(16) << _last <<std:: endl;
+
 }
 
 void Midpoint::set(int_type &i, float_type& w, int_type& c){
@@ -117,7 +128,7 @@ IncondenseMidpoint::IncondenseMidpoint( float_type* &weights,int_type* &coords,
 
 
 IncondenseMidpoint::IncondenseMidpoint( float_type* &weights,
-            int_type& dim, int_type& depth,int_type& node_id){
+            int_type& dim,int_type& node_id,int_type& depth){
     /*
 
     */

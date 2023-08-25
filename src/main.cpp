@@ -104,26 +104,29 @@ void midpoint_demo(){
     typedef RandomDataBase<dim,length> myrdb;
     myrdb rdb;
     DataBaseInterface<myrdb> dbi(&rdb);
-    DataPoint* dp = dbi.next();
-    dp->print();
-    delete dp;
-    return ;
-    // IncondenseMidpoint* imidp1 = new IncondenseMidpoint(x1,dim,depth,node_id);
-    // IncondenseMidpoint* imidp2 = new IncondenseMidpoint(x2,dim,depth,node_id);
-    // Midpoint* midp = imidp1->condensate();
-    // imidp1->print();
-    // imidp2->print();
+    DataPoint* dp1 = dbi.next();
+    IncondenseMidpoint* imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,dp1->_node_id,depth);
+    Midpoint* midp = imidp1->condensate();
+    dbi.add_expressive_node(dp1->_data_id);
+
+    DataPoint* dp2 = dbi.next();
+    IncondenseMidpoint* imidp2 = new IncondenseMidpoint(dp2->_weights,dp2->_dim,depth,dp2->_node_id);
     
 
-    // MidpointTransform mt(midp,imidp2);
-    // int_type ei = mt.exit_index();
-    // std::cout  << "exit_index = " << ei << std::endl;
 
-    // delete [] x1;
-    // delete [] x2;
-    // delete midp;
-    // delete imidp1;
-    // delete imidp2;   
+    imidp2->print();
+    MidpointTransform mt(midp,imidp2);
+    int_type ei = mt.exit_index();
+    imidp2 = mt.run_transform();
+    std::cout  << "exit_index = " << ei << std::endl;
+    imidp2->print();
+   
+
+    delete dp1;
+    delete dp2;
+    delete midp;
+    delete imidp1;
+    delete imidp2;   
 }
 
 int main(int argc, char** argv){
