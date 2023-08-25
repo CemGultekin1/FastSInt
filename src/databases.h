@@ -2,7 +2,7 @@
 #include "constants.h"
 #include <vector>
 #include "random.h"
-
+#include "midpoint.h"
 
 class DataPoint{
     public:
@@ -13,6 +13,7 @@ class DataPoint{
         DataPoint(int_type dim);
         ~DataPoint();
         void print();
+        void smultip(float_type sc0,float_type sc1, DataPoint *dp);
 };
 
 
@@ -39,6 +40,10 @@ class DataBaseInterface{
         void reset_counter();
         void init_virtual_nodes();
         void add_expressive_node(int_type data_id);
+        DataPoint* midpoint2data(Midpoint* mipd);
+        float_type midpoint_accuracy(Midpoint* mipd);
+        DataPoint* operator[](int_type i);
+        DataPoint* virtual_node(int_type i);
 };
 
 
@@ -47,4 +52,4 @@ class DataBaseInterface{
 DataPoint* allocate_random_dp(int_type dim,random_vector_generator& rvg);
 
 
-#include "databaseinterface.tpp"
+#include "databases.tpp"

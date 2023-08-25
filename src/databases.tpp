@@ -1,4 +1,7 @@
 #include <iostream>
+#include <cmath>
+#include "midpoint.h"
+
 
 template <class DB>
 DataBaseInterface<DB>::DataBaseInterface(DB* adb){
@@ -51,6 +54,73 @@ void DataBaseInterface<DB>::add_expressive_node(int_type data_id){
 
 
 
+
+template <class DB>
+DataPoint* DataBaseInterface<DB>::operator[](int_type i){
+    if(i <= _dim){
+        return virtual_node(i);
+    }else{
+        return (*_abstr_db)[i - _dim -1];
+    }
+}
+template <class DB>
+DataPoint* DataBaseInterface<DB>::virtual_node(int_type i){
+    if(i > _dim){
+        return nullptr;
+    }
+    DataPoint* dp = new DataPoint(_dim);
+    float_type* w = dp->_weights;
+    for(float_type* curs = w; curs-w < _dim; curs ++ ){
+        *curs = 0.;
+    }
+    if(i < _dim){
+        w[i] = 1;
+    }    
+    
+    return dp;
+}
+
+template <class DB>
+DataPoint* DataBaseInterface<DB>::midpoint2data(Midpoint* midp){
+    float_type* w = midp->_weights;
+    DataPoint* dp = nullptr;
+    DataPoint* dp1;
+    float_type* crs;
+    float_type* crs1;
+    for(int_type* c= midp->_coords; *c !=EOC ; c++,w++){
+        if(*c == NLLC){
+            continue;
+        }
+
+        dp1 = (*this)[*c];
+
+        if(dp == nullptr){
+            dp = dp1;
+        }else{
+            dp->smultip(1.,*w,dp1);
+            delete dp1;
+        }
+    }   
+    return dp;
+}
+
+
+template <class DB>
+float_type DataBaseInterface<DB>::midpoint_accuracy(Midpoint* midp){
+    DataPoint* dp = midpoint2data(midp);
+    float_type* w1 = dp->_weights;
+    float_type* w0 = midp->_weights;
+    float_type err = 0;
+    float_type norm = 0;
+    for(int_type i = 0; i < _dim; i ++, w0++ , w1++){
+        err += pow((*w0) - (*w1),2);
+        norm += pow((*w1),2);
+    }
+    delete dp;
+    return 1. - err/norm;
+}
+
+
 template <int_type DIM,int_type LENGTH>
 DataPoint*  RandomDataBase<DIM,LENGTH>::operator[](int_type i){
     if(i>=LENGTH){
@@ -60,3 +130,6 @@ DataPoint*  RandomDataBase<DIM,LENGTH>::operator[](int_type i){
     random_vector_generator rvg(i*DIM + 1);    
     return allocate_random_dp(DIM,rvg);
 }
+
+
+

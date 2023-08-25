@@ -1,8 +1,8 @@
 #include "databases.h"
 #include "random.h"
+#include "linalg.h"
 #include <iostream>
 #include <iomanip>
-
 
 
 DataPoint* allocate_random_dp(int_type dim,random_vector_generator& rvg){
@@ -14,6 +14,8 @@ DataPoint* allocate_random_dp(int_type dim,random_vector_generator& rvg){
 DataPoint::DataPoint(int_type dim){
     _weights = new float_type[dim];
     _dim = dim;
+    _data_id = NLLC;
+    _node_id = NLLC;
 }
 void DataPoint::print(){
     float_type* crs = _weights;
@@ -29,5 +31,24 @@ DataPoint::~DataPoint(){
     if(_weights != nullptr) {
         delete [] _weights;
     }
+}
+
+
+void DataPoint::smultip(float_type sc0,float_type sc1, DataPoint *dp){
+    if(dp != nullptr){
+        float_type* w = _weights;
+        float_type* w1 = dp->_weights;
+        for(int_type i= 0; i < _dim; i++,w++,w1++){
+            *w = (*w)*sc0 + (*w1)*sc1; 
+        }
+    }else if(sc0 == 1.){
+        return;
+    }else{
+        float_type* w = _weights;
+        for(int_type i= 0; i < _dim; i++,w++){
+            *w = (*w)*sc0; 
+        }
+    }
+    
 }
 

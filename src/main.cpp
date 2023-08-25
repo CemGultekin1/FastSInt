@@ -1,12 +1,15 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
+#include <iomanip>
+
 #include "midpoint.h"
 #include "dag.h"
 #include "ioopers.h"
 #include "constants.h"
 #include "midptransform.h"
 #include "databases.h"
+
 class Simplex{
     Simplex* parent;
     Simplex* children;
@@ -114,13 +117,23 @@ void midpoint_demo(){
     
 
 
-    imidp2->print();
+    // imidp2->print();
     MidpointTransform mt(midp,imidp2);
     int_type ei = mt.exit_index();
     imidp2 = mt.run_transform();
+
     std::cout  << "exit_index = " << ei << std::endl;
-    imidp2->print();
-   
+    // imidp2->print();
+    
+    // float_type acc = dbi.midpoint_accuracy(imidp2);
+    DataPoint* dp1_ = dbi.midpoint2data(midp);
+    dp1_->print();
+    dp1->print();
+    delete dp1_;
+
+    // std::cout.precision(8);
+    // std::cout << std::scientific;
+    // std::cout  << "accuracy = " << acc << std::endl;
 
     delete dp1;
     delete dp2;
