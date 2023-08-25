@@ -22,8 +22,7 @@ IncondenseMidpoint* MidpointTransform::run_transform(){
 
     float_type alpha = w0[_exit_ind_imidp]/wm[_exit_ind];
 
-    std::cout << "int_type new_coord = _midp->_node_id; "<< new_coord << std::endl;
-    std::cout << "_exit_ind_imidp, _exit_ind,alpha = " << _exit_ind_imidp << "  " << _exit_ind << "  " << alpha << std::endl;
+
     if(alpha == 0){
         return _imidp;
     }
