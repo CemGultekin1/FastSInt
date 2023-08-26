@@ -98,7 +98,7 @@ void rotate_demo(){
 
 
 void midpoint_demo(){
-    const int_type dim = 10;    
+    const int_type dim = 10000;    
     const int_type length = 5;
     int_type depth = 4;
     int_type node_id = dim+2;
@@ -114,10 +114,10 @@ void midpoint_demo(){
     // midp->_node_id = new_node_id;
     float_type acc = dbi.midpoint_accuracy(midp,0);
     std::cout << "first midpoint accuracy = " << acc << std::endl;
-    DataPoint* dp1_ = dbi.midpoint2data(midp);
-    dp1_->print();
-    dp1->print();
-    delete dp1_;
+    // DataPoint* dp1_ = dbi.midpoint2data(midp);
+    // dp1_->print();
+    // dp1->print();
+    // delete dp1_;
     // delete dp1;
 
 

@@ -210,7 +210,6 @@ void IncondenseMidpoint::last_coord_adjustment(){
 
 Midpoint* IncondenseMidpoint::condensate() const{
     int_type len = get_condensed_length() + 1;
-    std::cout << " get_condensed_length() = " << len << std::endl;
     Midpoint* midp = new Midpoint(len,_node_id);
     int_type j =0;
     int_type* c = _coords;
