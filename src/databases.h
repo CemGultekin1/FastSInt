@@ -39,9 +39,9 @@ class DataBaseInterface{
         DataPoint* next();
         void reset_counter();
         void init_virtual_nodes();
-        void add_expressive_node(int_type data_id);
+        int_type add_expressive_node(int_type data_id);
         DataPoint* midpoint2data(Midpoint* mipd);
-        float_type midpoint_accuracy(Midpoint* mipd);
+        float_type midpoint_accuracy(Midpoint* midp,int_type data_id);
         DataPoint* operator[](int_type i);
         DataPoint* virtual_node(int_type i);
 };

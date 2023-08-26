@@ -48,8 +48,9 @@ void DataBaseInterface<DB>::reset_counter(){
 }
 
 template <class DB>
-void DataBaseInterface<DB>::add_expressive_node(int_type data_id){
+int_type DataBaseInterface<DB>::add_expressive_node(int_type data_id){
     _expressive_data_id_subset.push_back(data_id);
+    return  static_cast<int_type>(_expressive_data_id_subset.size());
 }
 
 
@@ -74,7 +75,7 @@ DataPoint* DataBaseInterface<DB>::virtual_node(int_type i){
         *curs = 0.;
     }
     if(i < _dim){
-        w[i] = 1;
+        w[i] = _dim + 1;
     }    
     
     return dp;
@@ -96,6 +97,7 @@ DataPoint* DataBaseInterface<DB>::midpoint2data(Midpoint* midp){
 
         if(dp == nullptr){
             dp = dp1;
+            dp->smultip(*w,1.,nullptr);
         }else{
             dp->smultip(1.,*w,dp1);
             delete dp1;
@@ -106,10 +108,11 @@ DataPoint* DataBaseInterface<DB>::midpoint2data(Midpoint* midp){
 
 
 template <class DB>
-float_type DataBaseInterface<DB>::midpoint_accuracy(Midpoint* midp){
+float_type DataBaseInterface<DB>::midpoint_accuracy(Midpoint* midp,int_type data_id){
     DataPoint* dp = midpoint2data(midp);
     float_type* w1 = dp->_weights;
-    float_type* w0 = midp->_weights;
+    DataPoint* dp1 = (*_abstr_db)[data_id];
+    float_type* w0 = dp1->_weights;
     float_type err = 0;
     float_type norm = 0;
     for(int_type i = 0; i < _dim; i ++, w0++ , w1++){
@@ -117,6 +120,7 @@ float_type DataBaseInterface<DB>::midpoint_accuracy(Midpoint* midp){
         norm += pow((*w1),2);
     }
     delete dp;
+    delete dp1;
     return 1. - err/norm;
 }
 

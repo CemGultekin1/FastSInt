@@ -110,7 +110,19 @@ void midpoint_demo(){
     DataPoint* dp1 = dbi.next();
     IncondenseMidpoint* imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,dp1->_node_id,depth);
     Midpoint* midp = imidp1->condensate();
-    dbi.add_expressive_node(dp1->_data_id);
+    int_type new_node_id = dbi.add_expressive_node(dp1->_data_id);
+    // midp->_node_id = new_node_id;
+    float_type acc = dbi.midpoint_accuracy(midp,0);
+    std::cout << "first midpoint accuracy = " << acc << std::endl;
+    DataPoint* dp1_ = dbi.midpoint2data(midp);
+    dp1_->print();
+    dp1->print();
+    delete dp1_;
+    // delete dp1;
+
+
+    
+
 
     DataPoint* dp2 = dbi.next();
     IncondenseMidpoint* imidp2 = new IncondenseMidpoint(dp2->_weights,dp2->_dim,depth,dp2->_node_id);
@@ -121,25 +133,26 @@ void midpoint_demo(){
     MidpointTransform mt(midp,imidp2);
     int_type ei = mt.exit_index();
     imidp2 = mt.run_transform();
-
+    Midpoint* midp2 = imidp2->condensate();
     std::cout  << "exit_index = " << ei << std::endl;
     // imidp2->print();
     
-    // float_type acc = dbi.midpoint_accuracy(imidp2);
-    DataPoint* dp1_ = dbi.midpoint2data(midp);
-    dp1_->print();
-    dp1->print();
-    delete dp1_;
+    acc = dbi.midpoint_accuracy(midp2,1);
+    // DataPoint* dp2_ = dbi.midpoint2data(imidp2);
+    // dp2_->print();
+    // dp2->print();
+    // delete dp2_;
 
-    // std::cout.precision(8);
-    // std::cout << std::scientific;
-    // std::cout  << "accuracy = " << acc << std::endl;
+    std::cout.precision(8);
+    std::cout << std::scientific;
+    std::cout  << "accuracy = " << acc << std::endl;
 
     delete dp1;
     delete dp2;
     delete midp;
+    delete midp2;  
     delete imidp1;
-    delete imidp2;   
+    delete imidp2;      
 }
 
 int main(int argc, char** argv){
