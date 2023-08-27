@@ -6,7 +6,7 @@
 #include "ioopers.h"
 
 
-class GraphEdgeType{
+class GraphEdgeType{// in case of multiple parents, finding depth would require
     GraphEdgeType* _parent;
     GraphEdgeType* _children;
     bool _leaf;
