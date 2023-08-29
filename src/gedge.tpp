@@ -1,4 +1,4 @@
-#include  "dag.h"
+#include  "gedge.h"
 #include <stdexcept>
 #include <string>
 
@@ -60,7 +60,6 @@ int_type GraphEdgeType<Feature>:: get_num_children(){
 template<class Feature>
 void GraphEdgeType<Feature>::add_children(std::vector<GraphEdgeType<Feature>*> * edges,int_type first_child_edge_id){
     int_type edge_id = first_child_edge_id;
-    std::cout << "edge_id = "  << _edge_id << " creating " << _num_children << " many children" << std::endl;
     _children =  new GraphEdgeType<Feature>[_num_children];
     GraphEdgeType<Feature>* child;
     for(child=_children;child - _children  < _num_children; child++, edge_id++){
@@ -159,10 +158,12 @@ GraphEdgeType<Feature>* GraphEdgeType<Feature>::get_children(){
 }
 
 template<class Feature>
-void GraphEdgeType<Feature>::add_feature(std::vector<Feature*>* features){
+bool GraphEdgeType<Feature>::add_feature(std::vector<Feature*>* features){
     if(features->size() > _edge_id){
         _features = (*features)[_edge_id];
+        return true;
     }
+    return false;
 }
 
 

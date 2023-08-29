@@ -11,23 +11,6 @@ DAG<Feature>::DAG(int_type width){
 }
 
 
-// template <class Feature>
-// void DAG<Feature>::edge_to_file(BinarySegmentWriter*bsw,DAG<Feature>::Edge* edgeptr) const{
-//     edgeptr->to_binary(bsw);
-// }
-    
-    
-// template <class Feature>
-// void DAG<Feature>::edge_from_file(BinarySegmentReader*bsr,DAG<Feature>::Edge* edgeptr){
-//     edgeptr->from_binary(bsr,&_edges);
-//     int_type edge_id = edgeptr->_edge_id;
-//     if(_edge_features.size() > edge_id){
-//         Feature* feat = _edge_features[edge_id]
-//         edgeptr->add_feature(feat);
-//     }
-
-// }
-
 
 template <class Feature>
 void DAG<Feature>::to_file(std::string _filename){
@@ -147,26 +130,27 @@ GraphEdgeType<Feature>* DAG<Feature>::branch_from_edge(Edge* x,int_type num_chil
 
 
 template <class Feature>
-void DAG<Feature>::print(){
+void DAG<Feature>::print(bool keep_short){
     int_type parent_id = -1;
     int_type edge_id;
     int_type width = 6;
     std::cout << "max number of branches = " << _width <<std::endl;
     std::cout << "depth = " << _depth <<std::endl;
-    for(auto edgeptr: _edges){
-        std::cout << edgeptr->to_string() << std::endl;
-        // if(!(edgeptr->is_first())){
-        //     parent_id = edgeptr->get_parent()->get_edge_id();
-        // }
-        // edge_id = edgeptr->get_edge_id();
-        // std::cout <<std::setw(width/2)<< edge_id << std::setw(width) 
-        //         << "<<" <<std::setw(width) << parent_id<<std::endl;        
+    if(!keep_short){
+        for(auto edgeptr: _edges){
+            std::cout << edgeptr->to_string() << std::endl;    
+        }
     }
+    std::cout << "number of edges = " << _edges.size() << std::endl;
 }
 template <class Feature>
 void DAG<Feature>::add_feature(Feature*feat,Edge*edge){
     int_type edge_id = edge->_edge_id;
-    _edge_features->resize(edge_id +1 ,nullptr);
+    _edge_features.resize(edge_id +1 ,nullptr);
     _edge_features[edge_id] = feat;
-    edge->add_features(feat);
+    edge->add_feature(&_edge_features);
 }
+
+
+
+

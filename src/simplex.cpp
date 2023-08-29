@@ -1,6 +1,6 @@
 #include "simplex.h"
 #include "midptransform.h"
-
+#include "stdexcept"
 
 
 
@@ -10,12 +10,14 @@ void SimplexDAG::to_file(std::string _dagfile,std::string _midpointfile){
     BinaryBuffer* buff = new BinaryBuffer();
     BinarySegmentWriter* bsw;
     int_type midp_id;
-    _edge_features.clear();
+    // _edge_features.clear();
     // _edge_features.resize(_edges.size(),nullptr);
     for(auto edgeptr: _edges){
         bsw = buff->new_segment();  
-        midp_id = edgeptr->_features->_midpoint_id;
-        bsw->write((char*) &midp_id,sizeof(midp_id));
+        if(edgeptr->_features != nullptr){
+            midp_id = edgeptr->_features->_midpoint_id;
+            bsw->write((char*) &midp_id,sizeof(midp_id));
+        }        
         delete bsw;
     }
     // writing the midpoints
@@ -30,43 +32,91 @@ void SimplexDAG::to_file(std::string _dagfile,std::string _midpointfile){
 }
 void SimplexDAG::from_file(std::string _dagfile,std::string _midpointfile){
     DAG<Midpoint>::from_file(_dagfile);
-    _dim = _width;
+
     BinaryBuffer* buff = new BinaryBuffer();
     buff->from_file(_midpointfile);  
     BinarySegmentReader* bsr;
     int_type nsegs = buff->num_segments();
     int_type* midp_id;
     int_type nedges = _edges.size();
-    std::vector<int_type> midpids(nedges,0);
+
+    // std::cout << "nsegs, negdes = " << nsegs << " "<< nedges << std::endl;
+
+    std::vector<int_type> midpids(nedges,NLLC);
     for(int_type edge_id  = 0; edge_id < nedges; edge_id ++ ){
         bsr = buff->read_segment(edge_id);
-        midp_id = (int_type*) bsr->next(sizeof(int_type));
-        midpids[edge_id] = *midp_id;
+        if(bsr->get_size() > 0){
+            midp_id = (int_type*) bsr->next(sizeof(int_type));
+            midpids[edge_id] = *midp_id;
+        }        
     }
-    _midpoints = SimplexDAG::MidpointVec(nsegs,nullptr);
+
+    std::cout << "edge_id midpoint_id mapping is read!" << std::endl;
+
+    _midpoints.resize(nsegs - nedges,nullptr);
     Midpoint* midptr;
-    for(int_type i = nedges; i < nsegs; i ++){        
+    for(int_type i = nedges; i < nsegs; i ++){      
+        std::cout << "bsr = buff->read_segment("   << i << ");" << std::endl;
         bsr = buff->read_segment(i);
         midptr = new Midpoint();
+        std::cout << "midptr->from_binary(bsr);" << std::endl;
         midptr->from_binary(bsr);
-        _midpoints[i]  = midptr;
+        std::cout << "_midpoints[i - nedges]  = midptr;" << std::endl;
+        _midpoints[i - nedges]  = midptr;
         
     }
     delete buff;
+    std::cout << "midpoints are read!" << std::endl;
+    _edge_features.resize(_edges.size(),nullptr);
+    int_type midpointloc;
     for(int_type edge_id  = 0; edge_id < nedges; edge_id ++ ){
-        _edges[edge_id]->add_feature(&_midpoints);
-        
+        midpointloc = midpids[edge_id];
+        if(midpointloc != NLLC){
+            _edge_features[edge_id] = _midpoints[midpointloc];
+        }
+    }
+    for(int_type edge_id  = 0; edge_id < nedges; edge_id ++ ){
+        _edges[edge_id]->add_feature(&_edge_features);
     }
     midpids.clear();
 }   
+
+int_type  SimplexDAG::add_midpoint(Midpoint* midp){
+    midp->_midpoint_id = _midpoints.size();
+    _midpoints.push_back(midp);
+    return midp->_midpoint_id;
+}
+// int_type SimplexDAG::add_midpoint_connection(int_type edge_id, int_type midpoint_id){
+    // _edge_features
+// }
+
+void SimplexDAG::midpoint_split_on_simplex(Simplex* sm){
+    if(!sm->is_leaf()){
+        throw std::runtime_error("This simplex not a leaf, can't add midpoint to it");
+    }
+    branch_from_edge(sm,sm->_features->get_length());
+}
+void SimplexDAG::add_node_to_dag(DataPoint* dp){
+    IncondenseMidpoint imidp(dp->_weights,dp->_dim, _depth,dp->_data_id,dp->_node_id,_midpoints.size());
+    Walker walker(this,&imidp);
+    walker.move_down_all_the_way();
+    Midpoint* midp = imidp.condensate();
+    int_type midpoint_id = add_midpoint(midp);
+    Simplex* sm = walker._path->current();
+    add_feature(midp,sm);
+    midpoint_split_on_simplex(sm);
+}
+
+
+
+
 SimplexDAG::~SimplexDAG(){
-    DAG<Midpoint>::~DAG();
     _midpoints.clear();
 }
 
 Path::Path(int_type depth){
     _depth = depth;
-    _path = new Simplex*[_depth];
+    _path = new Simplex*[_depth + 1];
     _crs = 0;
     _lst = 0;
 }
@@ -106,6 +156,7 @@ Walker::Walker(SimplexDAG* sd,IncondenseMidpoint*imipdtr){
 }
 
 bool Walker::move_down(){
+    
     Simplex* smptr = _path->current();
     Midpoint* midptr = smptr->_features;
     if(midptr == nullptr){
@@ -113,9 +164,13 @@ bool Walker::move_down(){
     }
     MidpointTransform midt (midptr,_imidptr);
     int_type exit_index = midt.exit_index();
+    if(smptr->get_num_children() <= exit_index){
+        throw std::runtime_error("No children but a midpoint?");
+    }
     Simplex* newsmptr = &(smptr->_children[exit_index]);
     midt.run_transform();
     _path->add(newsmptr);
+    _path->down();
     return true;
 }
 
@@ -127,16 +182,3 @@ void Walker::move_down_all_the_way(){
 Walker::~Walker(){
     delete _path;
 }
-
-// Walker* SimplexDAG::find_simplex(IncondenseMidpoint* imidp){
-//     // Midpoint* midptr;
-
-//     Walker* walker = new Walker(this,imidp);
-//     while(walker->move_down()){
-//         continue;
-//     }
-//     return walker;
-// }
-// Simplex* SimplexDAG::add_midpoint(Midpoint*midp,int_type nsimplex){
-
-// }

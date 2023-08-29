@@ -254,9 +254,13 @@ void Midpoint::from_binary(BinarySegmentReader* nd){
     int_ptr =  (int_type*) nd->next(sizeof(int_type));   
     _midpoint_id = *int_ptr; 
 
-    delete int_ptr;
+    std::cout << "int_type* _coords = (int_type*) nd->next(sizeof(int_type)*(*num_coords));" << std::endl;
     int_type* _coords = (int_type*) nd->next(sizeof(int_type)*(*num_coords));
+
+    std::cout << "float_type* _weights = (float_type*) nd->next(sizeof(float_type)*(*num_coords));" << std::endl;
     float_type* _weights = (float_type*) nd->next(sizeof(float_type)*(*num_coords));
+
+    delete int_ptr;
     delete num_coords;
 }
 
@@ -264,7 +268,7 @@ void Midpoint::to_binary(BinarySegmentWriter* bb) const{
     if(_weights == nullptr){
         return;
     }
-    int_type x= get_length();
+    int_type x= get_length() + 1;
     bb->write((char*) &x,sizeof(x));
     bb->write((char*) &_data_id,sizeof(_data_id));
     bb->write((char*) &_node_id,sizeof(_node_id));

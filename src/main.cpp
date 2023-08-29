@@ -9,12 +9,8 @@
 #include "constants.h"
 #include "midptransform.h"
 #include "databases.h"
+#include "simplex.h"
 
-class Simplex{
-    Simplex* parent;
-    Simplex* children;
-    Midpoint* midpoint;
-};
 
 
 
@@ -113,26 +109,17 @@ void midpoint_demo(){
     myrdb rdb;
     DataBaseInterface<myrdb> dbi(&rdb);
     DataPoint* dp1 = dbi.next();
-    int_type data_id = 0;
     int_type midpoint_id = NLLC;
-    IncondenseMidpoint* imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,depth,data_id,dp1->_node_id,midpoint_id);
+    IncondenseMidpoint* imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,depth,dp1->_data_id,dp1->_node_id,midpoint_id);
     Midpoint* midp = imidp1->condensate();
     int_type new_node_id = dbi.add_expressive_node(dp1->_data_id);
     // midp->_node_id = new_node_id;
     float_type acc = dbi.midpoint_accuracy(midp,0);
     std::cout << "first midpoint accuracy = " << acc << std::endl;
-    // DataPoint* dp1_ = dbi.midpoint2data(midp);
-    // dp1_->print();
-    // dp1->print();
-    // delete dp1_;
-    // delete dp1;
-
-
-    
 
 
     DataPoint* dp2 = dbi.next();
-    IncondenseMidpoint* imidp2 = new IncondenseMidpoint(dp2->_weights,dp2->_dim,depth,dp2->_node_id);
+    IncondenseMidpoint* imidp2 = new IncondenseMidpoint(dp2->_weights,dp2->_dim,depth,dp2->_data_id,dp2->_node_id,0);
     
 
 
@@ -162,6 +149,45 @@ void midpoint_demo(){
     delete imidp2;      
 }
 
+void simplex_write(){
+    const int_type dim = 5;    
+    const int_type length = 32;
+    typedef RandomDataBase<dim,length> myrdb;
+    myrdb rdb;
+    DataBaseInterface<myrdb> dbi(&rdb);
+
+    DataPoint* dp1 = dbi.next();
+    SimplexDAG sdag(dim);
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);    
+    delete dp1;
+
+    sdag.print(false);
+    sdag.to_file("data/dag_binaries","data/midpoint_binaries");
+}
+
+void simplex_read(){
+    SimplexDAG sdag;
+    sdag.from_file("data/dag_binaries","data/midpoint_binaries");
+    sdag.print();
+}
+
+
 int main(int argc, char** argv){
     std::string arg = argv[1];
     if (arg == "--write_dag"){    
@@ -174,6 +200,10 @@ int main(int argc, char** argv){
         read_from_file();
     }else if (arg == "--midpoint"){
         midpoint_demo();
+    }else if (arg == "--write_simplex"){
+        simplex_write();
+    }else if (arg == "--read_simplex"){
+        simplex_read();
     }else{
         std::printf("argument %s not understood\n", arg.c_str());
     }

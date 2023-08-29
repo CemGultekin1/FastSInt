@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "midpoint.h"
-
+#include "databases.h"
 
 template <class DB>
 DataBaseInterface<DB>::DataBaseInterface(DB* adb){
@@ -16,7 +16,6 @@ DataBaseInterface<DB>::DataBaseInterface(DB* adb){
 template <class DB>
 void DataBaseInterface<DB>::init_virtual_nodes(){
     _expressive_data_id_subset.resize(_dim+1, NLLC);
-    // _counter = _expressive_data_id_subset.size();
 }
 
 template <class DB>

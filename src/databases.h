@@ -52,4 +52,4 @@ class DataBaseInterface{
 DataPoint* allocate_random_dp(int_type dim,random_vector_generator& rvg);
 
 
-#include "databaseinterface.tpp"
+#include "databases.tpp"

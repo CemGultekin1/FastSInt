@@ -32,7 +32,7 @@ $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	g++ -std=c++17 -g $(OBJS) -o $@ $(LDFLAGS)
 
 # Build step for C source
-$(BUILD_DIR)/%.c.o: %.c
+$(BUILD_DIR)/%.c.o: %.
 	mkdir -p $(dir $@)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
@@ -40,6 +40,7 @@ $(BUILD_DIR)/%.c.o: %.c
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(dir $@)
 	g++ -std=c++17 -g -c $< -o $@
+
 
 
 .PHONY: clean

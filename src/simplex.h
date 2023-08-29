@@ -1,6 +1,7 @@
+#pragma once
 #include "dag.h"
 #include "midpoint.h"
-
+#include "databases.h"
 
 typedef GraphEdgeType<Midpoint> Simplex;
 
@@ -34,15 +35,15 @@ class Walker{
 class SimplexDAG:public DAG<Midpoint>{    
     typedef std::vector<Midpoint*> MidpointVec;
     public:
-        int_type _dim;
         MidpointVec _midpoints;
-        SimplexDAG(int_type dim):DAG<Midpoint>(dim),_dim(dim){ _midpoints = MidpointVec();}
+        SimplexDAG(int_type dim):DAG<Midpoint>(dim+1){ _midpoints = MidpointVec();}
         SimplexDAG():DAG<Midpoint>(){ 
             _midpoints = MidpointVec();
-            _dim = get_width();
         }
         void to_file(std::string _dagfile,std::string _midpointfile);
         void from_file(std::string _dagfile,std::string _midpointfile);
-        void add_midpoint(Midpoint* );
+        int_type add_midpoint(Midpoint*);
+        void midpoint_split_on_simplex(Simplex* sm);
+        void add_node_to_dag(DataPoint* dp);
         ~SimplexDAG();
 };
