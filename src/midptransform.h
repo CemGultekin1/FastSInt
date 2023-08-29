@@ -10,5 +10,5 @@ class MidpointTransform{
         void all_exit_indices(float_type,int_type*);
         int_type exit_index();
         bool no_exit();
-        IncondenseMidpoint* run_transform();
+        void run_transform();
 };

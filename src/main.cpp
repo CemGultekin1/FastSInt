@@ -37,6 +37,7 @@ void write_to_file(){
     bb.to_file(path);
 }
 
+
 void read_from_file(){
     std::string path = "data/dag_binaries";
     BinaryBuffer* bb = new BinaryBuffer();
@@ -56,12 +57,16 @@ void read_from_file(){
 }
 
 
+typedef DAG<int_type> SimpleDAG;
+typedef GraphEdgeType<int_type> SimpleGraphEdge;
+
 void dag_write(){
-    DAG dag;
-    GraphEdgeType* edge = dag._edges[0];
-    GraphEdgeType* edge1 = dag.branch_from_edge(edge, 3);
-    GraphEdgeType* edge2 = dag.branch_from_edge(edge1,4);
-    GraphEdgeType* edge3 =dag.branch_from_edge(edge2,5);
+    
+    SimpleDAG dag;
+    SimpleGraphEdge* edge = dag._edges[0];
+    SimpleGraphEdge* edge1 = dag.branch_from_edge(edge, 3);
+    SimpleGraphEdge* edge2 = dag.branch_from_edge(edge1,4);
+    SimpleGraphEdge* edge3 =dag.branch_from_edge(edge2,5);
 
 
     dag.branch_from_edge(edge3,2);
@@ -71,11 +76,11 @@ void dag_write(){
 
 void dag_read(){
     int_type width = 5;
-    DAG dag(width);
+    SimpleDAG dag(width);
     dag.from_file("data/dag_binaries");
     dag.print();
     std::cout << "-----------------------" << std::endl;
-    GraphEdgeType* edge = dag._edges[14];
+    SimpleGraphEdge* edge = dag._edges[14];
     dag.branch_from_edge(edge, 7);
     dag.print();
 }
@@ -108,7 +113,9 @@ void midpoint_demo(){
     myrdb rdb;
     DataBaseInterface<myrdb> dbi(&rdb);
     DataPoint* dp1 = dbi.next();
-    IncondenseMidpoint* imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,dp1->_node_id,depth);
+    int_type data_id = 0;
+    int_type midpoint_id = NLLC;
+    IncondenseMidpoint* imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,depth,data_id,dp1->_node_id,midpoint_id);
     Midpoint* midp = imidp1->condensate();
     int_type new_node_id = dbi.add_expressive_node(dp1->_data_id);
     // midp->_node_id = new_node_id;
@@ -132,7 +139,7 @@ void midpoint_demo(){
     // imidp2->print();
     MidpointTransform mt(midp,imidp2);
     int_type ei = mt.exit_index();
-    imidp2 = mt.run_transform();
+    mt.run_transform();
     Midpoint* midp2 = imidp2->condensate();
     std::cout  << "exit_index = " << ei << std::endl;
     // imidp2->print();

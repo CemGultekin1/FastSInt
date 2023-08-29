@@ -11,7 +11,7 @@ bool MidpointTransform::no_exit(){
     return _exit_ind == EOC;
 }
 
-IncondenseMidpoint* MidpointTransform::run_transform(){
+void MidpointTransform::run_transform(){
     int_type* cm = _midp->_coords;
     int_type* cm_init = cm;
     int_type* c0 = _imidp->_coords;
@@ -24,7 +24,7 @@ IncondenseMidpoint* MidpointTransform::run_transform(){
 
 
     if(alpha == 0){
-        return _imidp;
+        return ;//_imidp;
     }
     while(*cm!=EOC && *c0!=EOC){
         while(*c0 == NLLC && *c0!=EOC){
@@ -46,7 +46,7 @@ IncondenseMidpoint* MidpointTransform::run_transform(){
     _imidp->_coords[_exit_ind_imidp] = NLLC;
     _imidp->concatenate(alpha,new_coord);
 
-    return _imidp;
+    return;// _imidp;
 }
 
 void MidpointTransform::all_exit_indices(float_type tol, int_type* mem){
