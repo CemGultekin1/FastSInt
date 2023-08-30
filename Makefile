@@ -39,7 +39,7 @@ $(BUILD_DIR)/%.c.o: %.
 # Build step for C++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	mkdir -p $(dir $@)
-	g++ -std=c++17 -g -c $< -o $@
+	g++ -std=c++20 -g -c $< -o $@
 
 
 

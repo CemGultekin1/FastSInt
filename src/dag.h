@@ -9,12 +9,12 @@
 template <class Feature>
 class DAG{    
     protected:
-        int_type _width;
-        int_type _depth;
+        int_type _width;        
         typedef GraphEdgeType<Feature> Edge;
         typedef std::vector<Edge*> EdgeVec;
         typedef std::vector<Feature*> FeatureVec;
     public:
+    int_type _depth;
         EdgeVec _edges;
         FeatureVec _edge_features;
         DAG(int_type width = NLLC);

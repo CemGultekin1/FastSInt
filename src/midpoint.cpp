@@ -244,24 +244,18 @@ void Midpoint::from_binary(BinarySegmentReader* nd){
     if(nd->get_size() == 0){
         return;
     }
-    int_type* num_coords = (int_type*) nd->next(sizeof(int_type));    
-    int_type* int_ptr;
-    
-    int_ptr =  (int_type*) nd->next(sizeof(int_type));    
-    _data_id = *int_ptr;
-    int_ptr =  (int_type*) nd->next(sizeof(int_type));    
-    _node_id = *int_ptr;
-    int_ptr =  (int_type*) nd->next(sizeof(int_type));   
-    _midpoint_id = *int_ptr; 
+    int_type num_coords;
 
-    std::cout << "int_type* _coords = (int_type*) nd->next(sizeof(int_type)*(*num_coords));" << std::endl;
-    int_type* _coords = (int_type*) nd->next(sizeof(int_type)*(*num_coords));
+    num_coords =  *((int_type*) nd->next(sizeof(int_type)));
+    _data_id =  *((int_type*) nd->next(sizeof(int_type)));
+    _node_id =  *((int_type*) nd->next(sizeof(int_type)));
+    _midpoint_id =  *((int_type*) nd->next(sizeof(int_type)));
 
-    std::cout << "float_type* _weights = (float_type*) nd->next(sizeof(float_type)*(*num_coords));" << std::endl;
-    float_type* _weights = (float_type*) nd->next(sizeof(float_type)*(*num_coords));
 
-    delete int_ptr;
-    delete num_coords;
+    int_type* _coords = (int_type*) nd->next(sizeof(int_type)*(num_coords));
+
+
+    float_type* _weights = (float_type*) nd->next(sizeof(float_type)*(num_coords));
 }
 
 void Midpoint::to_binary(BinarySegmentWriter* bb) const{
@@ -269,13 +263,13 @@ void Midpoint::to_binary(BinarySegmentWriter* bb) const{
         return;
     }
     int_type x= get_length() + 1;
-    bb->write((char*) &x,sizeof(x));
-    bb->write((char*) &_data_id,sizeof(_data_id));
-    bb->write((char*) &_node_id,sizeof(_node_id));
-    bb->write((char*) &_midpoint_id,sizeof(_midpoint_id));
+    bb->write((char*) &x,sizeof(int_type));
+    bb->write((char*) &_data_id,sizeof(int_type));
+    bb->write((char*) &_node_id,sizeof(int_type));
+    bb->write((char*) &_midpoint_id,sizeof(int_type));
 
     
-    bb->write((char*) &_coords,sizeof(int_type)*x);
-    bb->write((char*) &_weights,sizeof(float_type)*x);
+    bb->write((char*) _coords,sizeof(int_type)*x);
+    bb->write((char*) _weights,sizeof(float_type)*x);
 
 }

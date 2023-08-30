@@ -52,3 +52,13 @@ void DataPoint::smultip(float_type sc0,float_type sc1, DataPoint *dp){
     
 }
 
+
+
+DataPoint*  RandomDataBase::operator[](int_type i){
+    if(i>=_length){
+        return nullptr;
+    }
+    float_type* weights = new float_type[_dim];
+    random_vector_generator rvg(i*_dim + 1);    
+    return allocate_random_dp(_dim,rvg);
+}

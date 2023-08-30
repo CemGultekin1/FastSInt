@@ -10,7 +10,7 @@
 #include "midptransform.h"
 #include "databases.h"
 #include "simplex.h"
-
+#include "math.h"
 
 
 
@@ -105,21 +105,20 @@ void midpoint_demo(){
     int_type node_id = dim+2;
     // _RandomDataBase rdb(dim,length);
 
-    typedef RandomDataBase<dim,length> myrdb;
-    myrdb rdb;
-    DataBaseInterface<myrdb> dbi(&rdb);
+    RandomDataBase rdb(dim,length);
+    DataBaseInterface<RandomDataBase> dbi(&rdb);
     DataPoint* dp1 = dbi.next();
     int_type midpoint_id = NLLC;
     IncondenseMidpoint* imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,depth,dp1->_data_id,dp1->_node_id,midpoint_id);
     Midpoint* midp = imidp1->condensate();
     int_type new_node_id = dbi.add_expressive_node(dp1->_data_id);
     // midp->_node_id = new_node_id;
-    float_type acc = dbi.midpoint_accuracy(midp,0);
+    float_type acc = dbi.midpoint_accuracy(midp);
     std::cout << "first midpoint accuracy = " << acc << std::endl;
 
 
     DataPoint* dp2 = dbi.next();
-    IncondenseMidpoint* imidp2 = new IncondenseMidpoint(dp2->_weights,dp2->_dim,depth,dp2->_data_id,dp2->_node_id,0);
+    IncondenseMidpoint* imidp2 = new IncondenseMidpoint(dp2->_weights,dp2->_dim,depth,dp2->_data_id,dp2->_node_id);
     
 
 
@@ -131,7 +130,7 @@ void midpoint_demo(){
     std::cout  << "exit_index = " << ei << std::endl;
     // imidp2->print();
     
-    acc = dbi.midpoint_accuracy(midp2,1);
+    acc = dbi.midpoint_accuracy(midp2);
     // DataPoint* dp2_ = dbi.midpoint2data(imidp2);
     // dp2_->print();
     // dp2->print();
@@ -150,11 +149,10 @@ void midpoint_demo(){
 }
 
 void simplex_write(){
-    const int_type dim = 5;    
+    const int_type dim = 1024;    
     const int_type length = 32;
-    typedef RandomDataBase<dim,length> myrdb;
-    myrdb rdb;
-    DataBaseInterface<myrdb> dbi(&rdb);
+    RandomDataBase rdb(dim,length);
+    DataBaseInterface<RandomDataBase> dbi(&rdb);
 
     DataPoint* dp1 = dbi.next();
     SimplexDAG sdag(dim);
@@ -177,16 +175,66 @@ void simplex_write(){
     sdag.add_node_to_dag(dp1);    
     delete dp1;
 
-    sdag.print(false);
+    sdag.print(true);
     sdag.to_file("data/dag_binaries","data/midpoint_binaries");
 }
 
 void simplex_read(){
     SimplexDAG sdag;
     sdag.from_file("data/dag_binaries","data/midpoint_binaries");
-    sdag.print();
+    sdag.print(true);
 }
 
+
+void simplex_accuracy_test(){
+    int_type   dim = (int_type) pow(2,16);
+    std::cout << "dim = " << dim << std::endl;
+    int_type length = 64;
+    RandomDataBase rdb(dim,length);
+    DataBaseInterface<RandomDataBase> dbi(&rdb);
+
+    DataPoint* dp1 = dbi.next();
+    SimplexDAG sdag(dim);
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);
+    delete dp1;
+
+    dp1 = dbi.next();    
+    sdag.add_node_to_dag(dp1);    
+    delete dp1;
+    IncondenseMidpoint* imidp1;
+    Walker* walker;
+    Midpoint* midp;
+    float_type acc;
+    for(int i = 0; i < 10; i ++){
+        dp1 = dbi.next();   
+        int_type depth = sdag._depth;
+        imidp1 = new IncondenseMidpoint(dp1->_weights,dp1->_dim,depth,dp1->_data_id,dp1->_node_id);
+        walker = new Walker(&sdag,imidp1);
+        walker->move_down_all_the_way();
+        midp = imidp1->condensate();
+        acc = dbi.midpoint_accuracy(midp);
+        std::cout << "accuracy = " << acc << std::endl;
+
+        delete dp1;
+        delete imidp1;
+        delete midp;
+        delete walker;
+    }
+    
+
+}
 
 int main(int argc, char** argv){
     std::string arg = argv[1];
@@ -204,6 +252,8 @@ int main(int argc, char** argv){
         simplex_write();
     }else if (arg == "--read_simplex"){
         simplex_read();
+    }else if (arg == "--simplex_accuracy_demo"){
+        simplex_accuracy_test();
     }else{
         std::printf("argument %s not understood\n", arg.c_str());
     }

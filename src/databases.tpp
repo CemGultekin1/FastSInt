@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <cmath>
 #include "midpoint.h"
@@ -107,10 +108,10 @@ DataPoint* DataBaseInterface<DB>::midpoint2data(Midpoint* midp){
 
 
 template <class DB>
-float_type DataBaseInterface<DB>::midpoint_accuracy(Midpoint* midp,int_type data_id){
+float_type DataBaseInterface<DB>::midpoint_accuracy(Midpoint* midp){
     DataPoint* dp = midpoint2data(midp);
     float_type* w1 = dp->_weights;
-    DataPoint* dp1 = (*_abstr_db)[data_id];
+    DataPoint* dp1 = (*_abstr_db)[midp->_data_id];
     float_type* w0 = dp1->_weights;
     float_type err = 0;
     float_type norm = 0;
@@ -124,15 +125,8 @@ float_type DataBaseInterface<DB>::midpoint_accuracy(Midpoint* midp,int_type data
 }
 
 
-template <int_type DIM,int_type LENGTH>
-DataPoint*  RandomDataBase<DIM,LENGTH>::operator[](int_type i){
-    if(i>=LENGTH){
-        return nullptr;
-    }
-    float_type* weights = new float_type[DIM];
-    random_vector_generator rvg(i*DIM + 1);    
-    return allocate_random_dp(DIM,rvg);
-}
+
+
 
 
 

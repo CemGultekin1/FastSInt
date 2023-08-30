@@ -17,9 +17,12 @@ class DataPoint{
 };
 
 
-template <int_type dim,int_type length>
+// template <const int_type& dim,const int_type& length>
 class RandomDataBase{
     public:        
+        int_type _dim;
+        int_type _length;
+        RandomDataBase(int_type dim, int_type length): _dim(dim),_length(length){};
         DataPoint* operator[](int_type);
         
 };
@@ -41,7 +44,7 @@ class DataBaseInterface{
         void init_virtual_nodes();
         int_type add_expressive_node(int_type data_id);
         DataPoint* midpoint2data(Midpoint* mipd);
-        float_type midpoint_accuracy(Midpoint* midp,int_type data_id);
+        float_type midpoint_accuracy(Midpoint* midp);
         DataPoint* operator[](int_type i);
         DataPoint* virtual_node(int_type i);
 };

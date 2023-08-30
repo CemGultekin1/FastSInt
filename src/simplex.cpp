@@ -40,7 +40,6 @@ void SimplexDAG::from_file(std::string _dagfile,std::string _midpointfile){
     int_type* midp_id;
     int_type nedges = _edges.size();
 
-    // std::cout << "nsegs, negdes = " << nsegs << " "<< nedges << std::endl;
 
     std::vector<int_type> midpids(nedges,NLLC);
     for(int_type edge_id  = 0; edge_id < nedges; edge_id ++ ){
@@ -51,22 +50,18 @@ void SimplexDAG::from_file(std::string _dagfile,std::string _midpointfile){
         }        
     }
 
-    std::cout << "edge_id midpoint_id mapping is read!" << std::endl;
+
 
     _midpoints.resize(nsegs - nedges,nullptr);
     Midpoint* midptr;
     for(int_type i = nedges; i < nsegs; i ++){      
-        std::cout << "bsr = buff->read_segment("   << i << ");" << std::endl;
         bsr = buff->read_segment(i);
         midptr = new Midpoint();
-        std::cout << "midptr->from_binary(bsr);" << std::endl;
         midptr->from_binary(bsr);
-        std::cout << "_midpoints[i - nedges]  = midptr;" << std::endl;
         _midpoints[i - nedges]  = midptr;
         
     }
     delete buff;
-    std::cout << "midpoints are read!" << std::endl;
     _edge_features.resize(_edges.size(),nullptr);
     int_type midpointloc;
     for(int_type edge_id  = 0; edge_id < nedges; edge_id ++ ){
